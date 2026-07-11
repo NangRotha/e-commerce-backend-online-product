@@ -22,8 +22,9 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 def authenticate_user(db: Session, username: str, password: str):
-    """ពិនិត្យអ្នកប្រើប្រាស់និងពាក្យសម្ងាត់"""
-    user = db.query(models.User).filter(models.User.username == username).first()
+    user = db.query(models.User).filter(
+        (models.User.username == username) | (models.User.email == username)
+    ).first()
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
