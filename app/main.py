@@ -11,7 +11,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ===== CORS Configuration (បានកែតម្រូវសម្រាប់ Production) =====
+# ===== CORS Configuration (ដោះស្រាយ CORS Error) =====
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
