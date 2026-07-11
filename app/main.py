@@ -15,12 +15,10 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Frontend-User
-        "http://localhost:5174",  # Frontend-Admin (ធម្មតា)
-        "http://localhost:5175",  # Frontend-Admin (បន្ថែមនេះ!)
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-        "http://127.0.0.1:5175",  # បន្ថែម 127.0.0.1:5175 ផងដែរ
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "https://e-commerce-user-online-product.vercel.app",  # <--- បន្ថែម Vercel URL នេះ
+        "https://e-commerce-backend-online-product.onrender.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
