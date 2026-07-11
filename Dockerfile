@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # ចម្លង requirements.txt ហើយដំឡើង dependencies
 COPY requirements.txt .
+
+# ធ្វើបច្ចុប្បន្នភាព pip ដើម្បីដោះស្រាយបញ្ហា Version Conflict
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ចម្លងកូដទាំងអស់ទៅក្នុង container
@@ -20,5 +23,5 @@ COPY . .
 # បង្ហាញ Port 8000
 EXPOSE 8000
 
-# រត់កម្មវិធីជាមួយ uvicorn (ប្រើ 0.0.0.0 ដើម្បីឱ្យ FastAPI Cloud ទទួលស្គាល់)
+# រត់កម្មវិធីជាមួយ uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
