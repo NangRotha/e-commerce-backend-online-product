@@ -11,14 +11,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ===== កែតម្រូវ CORS ឱ្យទទួលស្គាល់ Port 5175 =====
+# ===== CORS Configuration (បានកែតម្រូវសម្រាប់ Production) =====
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "https://e-commerce-user-online-product.vercel.app",  # <--- បន្ថែម Vercel URL នេះ
-        "https://e-commerce-backend-online-product.onrender.com",
+        "http://localhost:5173",                          # Frontend-User (Dev)
+        "http://localhost:5174",                          # Frontend-Admin (Dev)
+        "https://e-commerce-user-online-product.vercel.app",  # Frontend-User (Vercel)
+        "https://e-commerce-admin-online-product.vercel.app", # Frontend-Admin (Vercel)
+        "https://e-commerce-backend-online-product.onrender.com", # Backend (Render)
     ],
     allow_credentials=True,
     allow_methods=["*"],
