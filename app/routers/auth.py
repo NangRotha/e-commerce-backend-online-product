@@ -1,3 +1,4 @@
+# app/routers/auth.py (កែតម្រូវផ្នែកចុងក្រោយ)
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -5,6 +6,9 @@ from datetime import timedelta
 from app import schemas, crud, auth, models
 from app.database import get_db
 from app.config import settings
+import os
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
@@ -45,7 +49,6 @@ def update_profile(
 ):
     return crud.update_user(db=db, user_id=current_user.id, user_update=user_update)
 
-
 @router.post("/create-admin")
 def create_admin(
     username: str,
@@ -73,3 +76,66 @@ def create_admin(
     db.commit()
     db.refresh(admin)
     return {"message": f"Admin user '{username}' created successfully"}
+
+# ===== បន្ថែម Google Login Endpoint =====
+@router.post("/google/callback", response_model=schemas.Token)
+def google_login(token: str, db: Session = Depends(get_db)):
+    """
+    Google OAuth Login Callback
+    ទទួល Token ពី Google និងបង្កើត JWT Token សម្រាប់អ្នកប្រើប្រាស់
+    """
+    try:
+        # ត្រួតពិនិត្យ Google Token
+        CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+        if not CLIENT_ID:
+            raise HTTPException(status_code=500, detail="Google Client ID not configured")
+        
+        # ផ្ទៀងផ្ទាត់ Token
+        id_info = id_token.verify_oauth2_token(
+            token, requests.Request(), CLIENT_ID
+        )
+        
+        # ទាញយកព័ត៌មានពី Google
+        email = id_info.get('email')
+        if not email:
+            raise HTTPException(status_code=400, detail="Email not provided by Google")
+        
+        username = id_info.get('name', email.split('@')[0])
+        full_name = id_info.get('name', '')
+        picture = id_info.get('picture', None)
+        
+        # ស្វែងរក ឬបង្កើតអ្នកប្រើប្រាស់ក្នុង Database
+        user = db.query(models.User).filter(models.User.email == email).first()
+        if not user:
+            # បង្កើតអ្នកប្រើប្រាស់ថ្មី
+            import secrets
+            random_password = secrets.token_hex(16)
+            hashed_password = auth.get_password_hash(random_password)
+            
+            user = models.User(
+                email=email,
+                username=username,
+                hashed_password=hashed_password,
+                full_name=full_name,
+                profile_image_url=picture,
+                is_active=True,
+                is_admin=False
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+        
+        # បង្កើត JWT Token
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = auth.create_access_token(
+            data={"sub": user.username}, expires_delta=access_token_expires
+        )
+        
+        return {"access_token": access_token, "token_type": "bearer"}
+        
+    except ValueError as e:
+        # Google Token មិនត្រឹមត្រូវ
+        raise HTTPException(status_code=400, detail=f"Invalid Google token: {str(e)}")
+    except Exception as e:
+        # កំហុសផ្សេងៗ
+        raise HTTPException(status_code=500, detail=f"Google login failed: {str(e)}")

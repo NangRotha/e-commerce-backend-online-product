@@ -1,75 +1,34 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import engine, Base
-from app.routers import auth, products, orders, admin, cart, upload, pages
-import os
+from fastapi.staticfiles import StaticFiles
+from .database import engine, Base, SessionLocal
+from .models import User
+from .auth import get_password_hash
+from sqlalchemy.orm import Session
 
-Base.metadata.create_all(bind=engine)
+# Import all routers
+from .routers import auth, products, categories, cart, orders, admin, wishlist, coupons, banners, khqr, webhook
+from .routers import auth_google  # <--- បន្ថែមនេះ!
 
-app = FastAPI(
-    title="E-Commerce API",
-    description="Complete e-commerce platform API",
-    version="1.0.0"
-)
+app = FastAPI(title="E-Commerce API")
 
-# ==============================================================================
-# ទាញយក Allowed Origins ពី Environment Variables
-# ==============================================================================
-ALLOWED_ORIGINS_STR = os.getenv("ALLOWED_ORIGINS", "")
-if ALLOWED_ORIGINS_STR:
-    ALLOWED_ORIGINS = [origin.strip() for origin in ALLOWED_ORIGINS_STR.split(",") if origin.strip()]
-else:
-    ALLOWED_ORIGINS = [
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "https://e-commerce-user-online-product.vercel.app",
-        "https://e-commerce-admin-online-product.vercel.app",
-        "https://e-commerce-backend-online-product.onrender.com",
-    ]
-
-print(f"Allowed Origins: {ALLOWED_ORIGINS}")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(auth.router)
-app.include_router(products.router)
-app.include_router(orders.router)
-app.include_router(admin.router)
-app.include_router(cart.router)
-app.include_router(upload.router)
-app.include_router(pages.router)
-
-# ==============================================================================
-# បង្កើត Admin User ដោយស្វ័យប្រវត្តិនៅពេល Start
-# ==============================================================================
 @app.on_event("startup")
 def startup_event():
-    from sqlalchemy.orm import Session
-    from app.database import SessionLocal
-    from app import models
-    from app.auth import get_password_hash
-
-    db: Session = SessionLocal()
+    db = SessionLocal()
     try:
-        existing = db.query(models.User).filter(models.User.username == "admin").first()
-        if not existing:
+        user = db.query(User).filter(User.username == "admin").first()
+        if not user:
             print("Creating default admin user...")
-            admin = models.User(
+            new_admin = User(
                 username="admin",
-                email="admin@example.com",
+                email="admin@marketplace.com",
                 hashed_password=get_password_hash("admin123"),
-                full_name="Admin User",
-                is_active=True,
-                is_admin=True,
+                full_name="System Administrator",
+                role="admin",
+                is_active=True
             )
-            db.add(admin)
+            db.add(new_admin)
             db.commit()
             print("Default admin user created successfully! (admin / admin123)")
         else:
@@ -80,15 +39,51 @@ def startup_event():
         db.close()
 
 # ==============================================================================
-# Root Endpoint
+# CORS
 # ==============================================================================
-@app.get("/")
-def root():
-    return {"message": "Welcome to E-Commerce API"}
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ==============================================================================
-# Health Check Endpoint
+# Static Files
 # ==============================================================================
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
+if not os.path.exists(UPLOAD_DIR): os.makedirs(UPLOAD_DIR)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
+# ==============================================================================
+# Database
+# ==============================================================================
+Base.metadata.create_all(bind=engine)
+
+# ==============================================================================
+# Routers
+# ==============================================================================
+app.include_router(auth.router, prefix="/api", tags=["auth"])
+app.include_router(products.router, prefix="/api", tags=["products"])
+app.include_router(categories.router, prefix="/api", tags=["categories"])
+app.include_router(cart.router, prefix="/api", tags=["cart"])
+app.include_router(orders.router, prefix="/api", tags=["orders"])
+app.include_router(wishlist.router, prefix="/api", tags=["wishlist"])
+app.include_router(coupons.router, prefix="/api", tags=["coupons"])
+app.include_router(banners.router, prefix="/api", tags=["banners"])
+app.include_router(khqr.router, prefix="/api", tags=["khqr"])
+app.include_router(webhook.router, prefix="/api", tags=["webhook"])
+app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+app.include_router(auth_google.router)  # <--- បន្ថែមនេះ!
+
+@app.get("/")
+async def root():
+    return {"message": "E-Commerce API"}
+
 @app.get("/health")
-def health_check():
+async def health_check():
     return {"status": "healthy"}
