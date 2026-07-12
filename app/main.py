@@ -7,8 +7,8 @@ from .models import User
 from .auth import get_password_hash
 from sqlalchemy.orm import Session
 
-# Import all routers
-from .routers import auth, products, cart, orders, admin, wishlist, coupons, banners, khqr, webhook
+# ===== Import only existing routers =====
+from .routers import auth, products, cart, orders, admin, coupons, banners, khqr, webhook
 
 app = FastAPI(title="E-Commerce API")
 
@@ -70,7 +70,6 @@ app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(products.router, prefix="/api", tags=["products"])
 app.include_router(cart.router, prefix="/api", tags=["cart"])
 app.include_router(orders.router, prefix="/api", tags=["orders"])
-app.include_router(wishlist.router, prefix="/api", tags=["wishlist"])
 app.include_router(coupons.router, prefix="/api", tags=["coupons"])
 app.include_router(banners.router, prefix="/api", tags=["banners"])
 app.include_router(khqr.router, prefix="/api", tags=["khqr"])
