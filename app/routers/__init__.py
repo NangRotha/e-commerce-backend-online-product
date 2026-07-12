@@ -1,4 +1,2 @@
-# This file makes the routers directory a Python package
-# ដើម្បីឱ្យអ្នកអាច import routers ពី main.py
-
-from . import auth, products, cart, orders, admin, banners, khqr, webhook
+# app/routers/__init__.py
+# ទុកឯកសារនេះឱ្យនៅទទេ ដើម្បីកុំឱ្យមាន Circular Import

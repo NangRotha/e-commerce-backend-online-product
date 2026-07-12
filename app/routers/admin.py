@@ -9,7 +9,6 @@ from app.utils.cloudinary_upload import upload_image, delete_image
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
-# ===== GET Products (Fixed) =====
 @router.get("/products", response_model=List[schemas.ProductResponse])
 def get_all_products(
     skip: int = 0, 
@@ -17,7 +16,6 @@ def get_all_products(
     db: Session = Depends(get_db),
     admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)
 ):
-    """ទាញយកបញ្ជីផលិតផលទាំងអស់សម្រាប់ Admin"""
     products = crud.get_products(db, skip=skip, limit=limit)
     return products
 

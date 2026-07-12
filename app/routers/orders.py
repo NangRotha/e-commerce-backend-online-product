@@ -10,12 +10,10 @@ router = APIRouter(prefix="/api/orders", tags=["Orders"])
 @router.post("/", response_model=schemas.OrderResponse)
 def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db),
                  current_user: schemas.UserResponse = Depends(get_current_active_user_dependency)):
-    # 1. បង្កើត Order ជាមួយ default customer_name
     order_dict = order.dict()
     order_dict['customer_name'] = "Guest"
     db_order = crud.create_order(db=db, order=schemas.OrderCreate(**order_dict), user_id=current_user.id)
     
-    # 2. Update customer_name នៅក្នុង Database ជាមួយឈ្មោះពិត
     if current_user and current_user.full_name:
         db_order.customer_name = current_user.full_name
         db.commit()

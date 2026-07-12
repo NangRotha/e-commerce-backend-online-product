@@ -7,7 +7,6 @@ from app.auth import get_current_active_user_dependency
 
 router = APIRouter(prefix="/api/products", tags=["Products"])
 
-# បន្ថែម / នៅចុងបញ្ចប់ដើម្បីការពារ 307 Redirect
 @router.get("/", response_model=List[schemas.ProductResponse])
 def read_products(
     skip: int = 0,

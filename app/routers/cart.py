@@ -7,7 +7,6 @@ from app.auth import get_current_active_user_dependency
 
 router = APIRouter(prefix="/api/cart", tags=["Cart"])
 
-# ត្រូវប្រាកដថាមាន / នៅខាងចុងបញ្ចប់
 @router.get("/", response_model=List[schemas.CartItemResponse])
 def get_cart(db: Session = Depends(get_db),
              current_user: schemas.UserResponse = Depends(get_current_active_user_dependency)):
