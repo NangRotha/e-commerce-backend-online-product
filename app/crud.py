@@ -48,6 +48,7 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
 def get_product(db: Session, product_id: int):
     return db.query(models.Product).filter(models.Product.id == product_id).first()
 
+# ✅ មុខងារនេះត្រូវបានហៅដោយ @router.get("/products") នៅក្នុង admin.py
 def get_products(db: Session, skip: int = 0, limit: int = 100, category: str = None, is_new: bool = None):
     query = db.query(models.Product)
     if category:
@@ -103,7 +104,7 @@ def create_order(db: Session, order: schemas.OrderCreate, user_id: int):
     db.flush()
     
     total_amount = 0
-    discount_percent = order.discount_percent or 0.0  # <--- ទាញយក discount ពី Frontend
+    discount_percent = order.discount_percent or 0.0
 
     for item in order.items:
         product = get_product(db, item.product_id)

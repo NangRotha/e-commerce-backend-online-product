@@ -16,7 +16,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",                          # Frontend-User (Dev)
-        "http://localhost:5174",                          # Frontend-Admin (Dev)
+        "http://localhost:5174",   
+        "http://127.0.0.1:5174",                          # Frontend-Admin (Dev)
         "https://e-commerce-user-online-product.vercel.app",  # Frontend-User (Vercel)
         "https://e-commerce-admin-online-product.vercel.app", # Frontend-Admin (Vercel)
         "https://e-commerce-backend-online-product.onrender.com", # Backend (Render)
