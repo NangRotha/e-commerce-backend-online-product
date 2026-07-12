@@ -1,20 +1,19 @@
-# ប្រើ Python 3.9 ជារូបភាពមូលដ្ឋាន
-FROM python:3.9-slim
+# ប្រើ Python 3.11 ជារូបភាពមូលដ្ឋាន
+FROM python:3.11-slim
 
 # កំណត់ Working Directory
 WORKDIR /app
 
-# ដំឡើងបណ្ណាល័យប្រព័ន្ធដែលត្រូវការ
+# ដំឡើងបណ្ណាល័យប្រព័ន្ធដែកត្រូវការ
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # ចម្លង requirements.txt ហើយដំឡើង dependencies
 COPY requirements.txt .
 
-# ធ្វើបច្ចុប្បន្នភាព pip ដើម្បីដោះស្រាយបញ្ហា Version Conflict
-RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ចម្លងកូដទាំងអស់ទៅក្នុង container

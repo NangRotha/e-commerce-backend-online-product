@@ -1,0 +1,38 @@
+# render.yaml
+services:
+  - type: pserv
+    name: marketplace-postgres
+    plan: free
+    databaseName: marketplace
+    user: marketplace_user
+    postgresVersion: 15
+
+  - type: web
+    name: marketplace-backend
+    plan: free
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: singapore
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: marketplace-postgres
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: ALLOWED_ORIGINS
+        value: http://localhost:5173,http://localhost:5174,http://127.0.0.1:5174,https://e-commerce-admin-online-product.vercel.app,https://e-commerce-user-online-product.vercel.app,https://e-commerce-backend-online-product.onrender.com
+    autoDeploy: true

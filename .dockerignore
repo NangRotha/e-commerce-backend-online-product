@@ -5,3 +5,5 @@ __pycache__
 .gitignore
 README.md
 venv
+dist
+node_modules
