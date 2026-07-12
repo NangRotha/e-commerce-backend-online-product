@@ -9,6 +9,7 @@ from app.utils.cloudinary_upload import upload_image, delete_image
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
+# ===== GET Products =====
 @router.get("/products", response_model=List[schemas.ProductResponse])
 def get_all_products(
     skip: int = 0, 
@@ -16,6 +17,7 @@ def get_all_products(
     db: Session = Depends(get_db),
     admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)
 ):
+    """ទាញយកបញ្ជីផលិតផលទាំងអស់សម្រាប់ Admin"""
     products = crud.get_products(db, skip=skip, limit=limit)
     return products
 
@@ -41,7 +43,7 @@ def delete_product(product_id: int, db: Session = Depends(get_db),
         raise HTTPException(status_code=404, detail="Product not found")
     return {"message": "Product deleted successfully"}
 
-# ===== Route សម្រាប់ Settings =====
+# ===== Settings (Public + Admin) =====
 @router.get("/settings", response_model=schemas.SettingsResponse)
 def get_settings(db: Session = Depends(get_db), 
                  admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)):
@@ -53,11 +55,12 @@ def update_settings(settings_update: schemas.SettingsUpdate,
                     admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)):
     return crud.update_settings(db, settings_update)
 
-# ===== Route Public សម្រាប់ Settings (មិនត្រូវការ Admin) =====
+# ===== បន្ថែម Route Public Settings (មិនត្រូវការ Admin) =====
 @router.get("/settings/public", response_model=schemas.SettingsResponse)
 def get_public_settings(db: Session = Depends(get_db)):
     return crud.get_settings(db)
 
+# ===== Upload Image =====
 @router.post("/upload")
 def upload_image_endpoint(file: UploadFile = File(...)):
     try:
@@ -66,6 +69,7 @@ def upload_image_endpoint(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== Orders =====
 @router.get("/orders", response_model=List[schemas.OrderResponse])
 def get_all_orders(skip: int = 0, limit: int = 100, db: Session = Depends(get_db),
                    admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)):
@@ -96,6 +100,7 @@ def update_order_status(order_id: int, status: str, payment_status: Optional[str
     db.commit()
     return {"message": "Order status updated successfully"}
 
+# ===== Dashboard Stats =====
 @router.get("/dashboard/stats")
 def get_dashboard_stats(db: Session = Depends(get_db),
                          admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)):
