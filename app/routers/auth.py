@@ -82,7 +82,7 @@ def create_admin(
     db.refresh(admin)
     return {"message": f"Admin user '{username}' created successfully"}
 
-# ===== Google Login Endpoint with safe import =====
+# ===== Google Login Endpoint =====
 @router.post("/google/callback", response_model=schemas.Token)
 def google_login(token: str, db: Session = Depends(get_db)):
     """

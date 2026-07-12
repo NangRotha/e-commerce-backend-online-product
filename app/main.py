@@ -6,7 +6,7 @@ from .database import engine, Base, SessionLocal
 from .models import User
 from .auth import get_password_hash
 
-# ===== នាំចូលតែ Routers ដែលមានស្រាប់ប៉ុណ្ណោះ =====
+# ===== នាំចូលតែ Routers ដែលមានស្រាប់ =====
 from .routers import auth, products, cart, orders, admin
 
 app = FastAPI(title="E-Commerce API")

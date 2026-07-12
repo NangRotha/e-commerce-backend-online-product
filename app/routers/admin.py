@@ -41,6 +41,7 @@ def delete_product(product_id: int, db: Session = Depends(get_db),
         raise HTTPException(status_code=404, detail="Product not found")
     return {"message": "Product deleted successfully"}
 
+# ===== Route សម្រាប់ Settings =====
 @router.get("/settings", response_model=schemas.SettingsResponse)
 def get_settings(db: Session = Depends(get_db), 
                  admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)):
@@ -52,6 +53,7 @@ def update_settings(settings_update: schemas.SettingsUpdate,
                     admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)):
     return crud.update_settings(db, settings_update)
 
+# ===== Route Public សម្រាប់ Settings (មិនត្រូវការ Admin) =====
 @router.get("/settings/public", response_model=schemas.SettingsResponse)
 def get_public_settings(db: Session = Depends(get_db)):
     return crud.get_settings(db)

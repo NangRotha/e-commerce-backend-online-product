@@ -18,11 +18,12 @@ def read_products(
     products = crud.get_products(db, skip=skip, limit=limit, category=category, is_new=is_new)
     return products
 
-@router.get("/featured", response_model=List[schemas.ProductResponse])
+# ===== បន្ថែម / នៅចុងបញ្ចប់ =====
+@router.get("/featured/", response_model=List[schemas.ProductResponse])
 def read_featured_products(limit: int = 10, db: Session = Depends(get_db)):
     return crud.get_featured_products(db, limit=limit)
 
-@router.get("/new", response_model=List[schemas.ProductResponse])
+@router.get("/new/", response_model=List[schemas.ProductResponse])
 def read_new_products(limit: int = 10, db: Session = Depends(get_db)):
     return crud.get_new_products(db, limit=limit)
 
