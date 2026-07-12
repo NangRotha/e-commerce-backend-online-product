@@ -35,4 +35,8 @@ services:
         value: "30"
       - key: ALLOWED_ORIGINS
         value: http://localhost:5173,http://localhost:5174,http://127.0.0.1:5174,https://e-commerce-admin-online-product.vercel.app,https://e-commerce-user-online-product.vercel.app,https://e-commerce-backend-online-product.onrender.com
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
     autoDeploy: true

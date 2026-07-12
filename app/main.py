@@ -5,13 +5,13 @@ from fastapi.staticfiles import StaticFiles
 from .database import engine, Base, SessionLocal
 from .models import User
 from .auth import get_password_hash
-from sqlalchemy.orm import Session
 
-# ===== Import only existing routers =====
-from .routers import auth, products, cart, orders, admin, coupons, banners, khqr, webhook
+# ===== នាំចូលតែ Routers ដែលមានស្រាប់ប៉ុណ្ណោះ! =====
+from .routers import auth, products, cart, orders, admin, banners, khqr, webhook
 
 app = FastAPI(title="E-Commerce API")
 
+# Startup event to create admin user
 @app.on_event("startup")
 def startup_event():
     db = SessionLocal()
@@ -24,8 +24,8 @@ def startup_event():
                 email="admin@marketplace.com",
                 hashed_password=get_password_hash("admin123"),
                 full_name="System Administrator",
-                role="admin",
-                is_active=True
+                is_active=True,
+                is_admin=True
             )
             db.add(new_admin)
             db.commit()
@@ -55,7 +55,8 @@ app.add_middleware(
 # ==============================================================================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
-if not os.path.exists(UPLOAD_DIR): os.makedirs(UPLOAD_DIR)
+if not os.path.exists(UPLOAD_DIR): 
+    os.makedirs(UPLOAD_DIR)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # ==============================================================================
@@ -70,7 +71,6 @@ app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(products.router, prefix="/api", tags=["products"])
 app.include_router(cart.router, prefix="/api", tags=["cart"])
 app.include_router(orders.router, prefix="/api", tags=["orders"])
-app.include_router(coupons.router, prefix="/api", tags=["coupons"])
 app.include_router(banners.router, prefix="/api", tags=["banners"])
 app.include_router(khqr.router, prefix="/api", tags=["khqr"])
 app.include_router(webhook.router, prefix="/api", tags=["webhook"])
