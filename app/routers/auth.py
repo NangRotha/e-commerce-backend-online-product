@@ -82,7 +82,7 @@ def create_admin(
     db.refresh(admin)
     return {"message": f"Admin user '{username}' created successfully"}
 
-# ===== Google Login Endpoint (កែតម្រូវឱ្យទទួល JSON) =====
+# ===== Google Login Endpoint (Fixed) =====
 @router.post("/google/callback", response_model=schemas.Token)
 def google_login(
     token_data: dict = Body(...), 
