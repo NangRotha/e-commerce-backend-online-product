@@ -67,13 +67,12 @@ Base.metadata.create_all(bind=engine)
 # ==============================================================================
 # Routers (កែតម្រូវនៅទីនេះ!)
 # ==============================================================================
-# ✅ លុប prefix="/api" ចេញពី routers ទាំងអស់ លើកលែងតែ admin
-app.include_router(auth.router)          # auth.py មាន prefix="/api/auth" រួចហើយ
-app.include_router(products.router)      # products.py មាន prefix="/api/products" រួចហើយ
-app.include_router(cart.router, prefix="/api", tags=["cart"])
-app.include_router(orders.router, prefix="/api", tags=["orders"])
-app.include_router(admin.router)         # admin.py មាន prefix="/api/admin" រួចហើយ
-app.include_router(pages.router)         # pages.py មាន prefix="/api/pages" រួចហើយ
+app.include_router(auth.router)
+app.include_router(products.router)
+app.include_router(cart.router)      # <--- លុប prefix="/api" ចេញ
+app.include_router(orders.router)    # <--- លុប prefix="/api" ចេញ
+app.include_router(admin.router)
+app.include_router(pages.router)
 
 @app.get("/")
 async def root():
