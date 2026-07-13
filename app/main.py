@@ -70,10 +70,18 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 Base.metadata.create_all(bind=engine)
 
 # ==============================================================================
-# ✅ CRITICAL FIX: Routers (Added prefix="/api")
-# Now your frontend will find the /auth/login route correctly!
+# ✅ បញ្ជាក់ Routes ឲ្យច្បាស់ដោយឡែកពីគ្នា ដើម្បីកុំឲ្យមាន /api ពីរដង
 # ==============================================================================
+
+# 1. Auth Router: យើងកំណត់ prefix="/api" តែនៅទីនេះ
+#    ធ្វើដូចនេះ ប្រសិនបើក្នុង auth.py មាន @router.post("/login") 
+#    ផ្លូវពេញនឹងក្លាយជា /api/login (មិនមែន /api/api/auth/login ទេ)
 app.include_router(auth.router, prefix="/api")       
+
+# 2. Routers ផ្សេងទៀត: ពួកវាអាចនៅត្រង់ Root ឬប្រើ Prefix ផ្សេង។ 
+#    សម្រាប់ភាពស៊ីសង្វាក់គ្នា យើងក៏បន្ថែម prefix="/api" ដូចគ្នា។
+#    យកចិត្តទុកដាក់៖ នៅក្នុង routers/orders.py ជាដើម ត្រូវប្រាកដថា @router មានតែផ្លូវខ្លីៗ 
+#    (ឧ. @router.get("/orders") មិនមែន @router.get("/api/orders") ទេ)។
 app.include_router(products.router, prefix="/api")   
 app.include_router(cart.router, prefix="/api")       
 app.include_router(orders.router, prefix="/api")     
