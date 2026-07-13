@@ -1,11 +1,13 @@
+# app/database.py
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from app.config import settings
 
-# បន្ថែម pool_pre_ping=True ដើម្បីពិនិត្យ Connection មុនពេលប្រើ
+# ✅ ដាក់ DATABASE_URL ដោយផ្ទាល់ មិនបាច់អានពី .env
+DATABASE_URL = "postgresql://neondb_owner:npg_EqDI7gb5BtQV@ep-purple-butterfly-atuzjnrs-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
 engine = create_engine(
-    settings.DATABASE_URL,
+    DATABASE_URL,
     pool_pre_ping=True,
     pool_recycle=3600,
 )
