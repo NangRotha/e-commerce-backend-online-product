@@ -39,7 +39,11 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    
+    # ✅ ប្រើ SECRET_KEY ដោយផ្ទាល់ ដើម្បីកុំឱ្យមានកំហុស JWSError
+    SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+    
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
@@ -50,7 +54,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        # ✅ ប្រើ SECRET_KEY ដោយផ្ទាល់ដើម្បី decode
+        SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+        
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
@@ -75,7 +82,7 @@ def get_current_admin_user(current_user: models.User = Depends(get_current_activ
     return current_user
 
 # ===========================================
-# មុខងារ Dependency ដែលខ្វះ (បន្ថែមនេះដើម្បីដោះស្រាយបញ្ហា)
+# មុខងារ Dependency 
 # ===========================================
 
 def get_current_user_dependency(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
