@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
@@ -82,9 +82,12 @@ def create_admin(
     db.refresh(admin)
     return {"message": f"Admin user '{username}' created successfully"}
 
-# ===== Google Login Endpoint (បន្ថែម Route នេះ) =====
+# ===== Google Login Endpoint (កែតម្រូវឱ្យទទួល JSON) =====
 @router.post("/google/callback", response_model=schemas.Token)
-def google_login(token: str, db: Session = Depends(get_db)):
+def google_login(
+    token_data: dict = Body(...), 
+    db: Session = Depends(get_db)
+):
     """
     Google OAuth Login Callback
     ទទួល Token ពី Google និងបង្កើត JWT Token សម្រាប់អ្នកប្រើប្រាស់
@@ -96,6 +99,11 @@ def google_login(token: str, db: Session = Depends(get_db)):
         CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
         if not CLIENT_ID:
             raise HTTPException(status_code=500, detail="Google Client ID not configured")
+        
+        # ទាញយក token ពី dictionary
+        token = token_data.get('token')
+        if not token:
+            raise HTTPException(status_code=400, detail="Token not provided in request body")
         
         id_info = id_token.verify_oauth2_token(
             token, requests.Request(), CLIENT_ID

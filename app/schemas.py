@@ -7,6 +7,8 @@ class UserBase(BaseModel):
     email: EmailStr
     username: str
     full_name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str
@@ -18,6 +20,8 @@ class UserLogin(BaseModel):
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     profile_image_url: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
     password: Optional[str] = None
 
 class UserResponse(UserBase):
@@ -25,6 +29,8 @@ class UserResponse(UserBase):
     is_active: bool
     is_admin: bool
     profile_image_url: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
     created_at: datetime
     
     class Config:

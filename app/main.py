@@ -6,8 +6,8 @@ from .database import engine, Base, SessionLocal
 from .models import User
 from .auth import get_password_hash
 
-# ===== នាំចូលតែ Routers ដែលមានស្រាប់ =====
-from .routers import auth, products, cart, orders, admin
+# ===== នាំចូល Routers ទាំងអស់ =====
+from .routers import auth, products, cart, orders, admin, pages
 
 app = FastAPI(title="E-Commerce API")
 
@@ -65,13 +65,14 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 Base.metadata.create_all(bind=engine)
 
 # ==============================================================================
-# Routers
+# Routers (កែតម្រូវនៅទីនេះ!)
 # ==============================================================================
 app.include_router(auth.router, prefix="/api", tags=["auth"])
-app.include_router(products.router, prefix="/api", tags=["products"])
+app.include_router(products.router)  # <--- លុប prefix="/api" ចេញ
 app.include_router(cart.router, prefix="/api", tags=["cart"])
 app.include_router(orders.router, prefix="/api", tags=["orders"])
-app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+app.include_router(admin.router, tags=["admin"])
+app.include_router(pages.router, tags=["pages"])
 
 @app.get("/")
 async def root():

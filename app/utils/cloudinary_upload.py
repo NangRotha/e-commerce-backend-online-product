@@ -17,7 +17,10 @@ async def upload_image(file: UploadFile):
     ផ្ទុករូបភាពទៅ Cloudinary
     """
     try:
+        # អានមាតិការបស់ File
         file_content = await file.read()
+        
+        # ផ្ទុកទៅ Cloudinary
         result = cloudinary.uploader.upload(
             file_content,
             folder="e-commerce",

@@ -43,7 +43,7 @@ def delete_product(product_id: int, db: Session = Depends(get_db),
         raise HTTPException(status_code=404, detail="Product not found")
     return {"message": "Product deleted successfully"}
 
-# ===== Settings (Public + Admin) =====
+# ===== Settings =====
 @router.get("/settings", response_model=schemas.SettingsResponse)
 def get_settings(db: Session = Depends(get_db), 
                  admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)):
@@ -55,18 +55,20 @@ def update_settings(settings_update: schemas.SettingsUpdate,
                     admin: schemas.UserResponse = Depends(get_current_admin_user_dependency)):
     return crud.update_settings(db, settings_update)
 
-# ===== បន្ថែម Route Public Settings (មិនត្រូវការ Admin) =====
 @router.get("/settings/public", response_model=schemas.SettingsResponse)
 def get_public_settings(db: Session = Depends(get_db)):
     return crud.get_settings(db)
 
-# ===== Upload Image =====
+# ===== Upload Image (កែតម្រូវនៅទីនេះ!) =====
 @router.post("/upload")
-def upload_image_endpoint(file: UploadFile = File(...)):
+async def upload_image_endpoint(file: UploadFile = File(...)):
     try:
-        result = upload_image(file)
+        # បន្ថែម await នៅពីមុខ upload_image
+        result = await upload_image(file)
         return {"url": result["secure_url"], "public_id": result["public_id"]}
     except Exception as e:
+        # បោះពុម្ព Error ទៅកាន់ Console របស់ Backend
+        print(f"Upload error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # ===== Orders =====

@@ -12,6 +12,8 @@ class User(Base):
     hashed_password = Column(String)
     full_name = Column(String)
     profile_image_url = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    address = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
     is_admin = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
