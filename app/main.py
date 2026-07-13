@@ -38,27 +38,20 @@ def startup_event():
         db.close()
 
 # ==============================================================================
-# ✅ FIX 1: CORS (ត្រូវប្រាកដថាបន្ថែម Domain Vercel និង Localhost)
+# CORS
 # ==============================================================================
-# ដើម្បីសុវត្ថិភាព គួរតែកំណត់ List ច្បាស់លាស់ មិនមែនប្រើ Env Variable ទទេនោះទេ
-# ប៉ុន្តែប្រសិនបើលោកអ្នកចង់ប្រើ Env Variable ត្រូវប្រាកដថានៅក្នុង Render Dashboard មានកំណត់ ALLOWED_ORIGINS នេះ
-allowed_origins = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://e-commerce-user-online-product.vercel.app",
-    "https://e-commerce-admin-online-product.vercel.app"
-]
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins, # ✅ ប្រើ List ត្រឹមត្រូវ
-    allow_credentials=True,       # ✅ អនុញ្ញាតឲ្យផ្ញើ Cookie / Token
-    allow_methods=["*"],          # ✅ អនុញ្ញាតគ្រប់ Method (GET, POST, PUT, DELETE)
-    allow_headers=["*"],          # ✅ អនុញ្ញាតគ្រប់ Headers
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ==============================================================================
-# Static Files (មិនបាច់កែ)
+# Static Files
 # ==============================================================================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
@@ -72,17 +65,14 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 Base.metadata.create_all(bind=engine)
 
 # ==============================================================================
-# ✅ FIX 2: Routers (បន្ថែម Prefix តែម្ដងធ្វើឲ្យ Frontend ងាយស្រួលហៅ)
+# Routers (កែតម្រូវនៅទីនេះ!)
 # ==============================================================================
-# ក្នុង Frontend api.js របស់លោកអ្នក បានកំណត់ baseURL ទៅ .../api ហើយ
-# ដូច្នេះលោកអ្នកត្រូវបន្ថែម prefix="/api" នៅទីនេះដើម្បីឲ្យវាត្រូវគ្នា។
-
-app.include_router(auth.router, prefix="/api")       # ✅ បន្ថែម prefix
-app.include_router(products.router, prefix="/api")   # ✅ បន្ថែម prefix
-app.include_router(cart.router, prefix="/api")       # ✅ បន្ថែម prefix
-app.include_router(orders.router, prefix="/api")     # ✅ បន្ថែម prefix
-app.include_router(admin.router, prefix="/api")      # ✅ បន្ថែម prefix
-app.include_router(pages.router, prefix="/api")      # ✅ បន្ថែម prefix
+app.include_router(auth.router)
+app.include_router(products.router)
+app.include_router(cart.router)      # <--- លុប prefix="/api" ចេញ
+app.include_router(orders.router)    # <--- លុប prefix="/api" ចេញ
+app.include_router(admin.router)
+app.include_router(pages.router)
 
 @app.get("/")
 async def root():
